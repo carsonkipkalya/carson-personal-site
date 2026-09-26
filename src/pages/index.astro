@@ -1,55 +1,28 @@
 ---
-import { getCollection } from "astro:content";
-
 import BaseLayout from "../layouts/BaseLayout.astro";
-import SectionHeading from "../components/SectionHeading.astro";
-import Button from "../components/Button.astro";
-import ProjectCard from "../components/ProjectCard.astro";
-
-const projects = await getCollection("projects");
 ---
 
 <BaseLayout>
-  <section id="about" class="container">
-    <SectionHeading
-  label="About"
-  title="A Little Context"
-/>
-
-    <p>
-      I'm interested in systems — code, markets, minds, organizations —
-      and what makes them work.
-    </p>
-
-    <Button href="#projects">See my work</Button>
+  <section id="hero" class="container hero" aria-label="Hero">
+    <h1>Carson Kipkalya</h1>
   </section>
 
-  <section id="projects" class="container">
-  <SectionHeading
-    label="Projects"
-    title="Things I've Built"
-  />
-
-  <div class="projects-list">
-    {projects
-      .filter((project) => project.data.featured)
-      .map((project) => (
-        <ProjectCard
-          title={project.data.title}
-          description={project.data.description}
-          tags={project.data.tags}
-        />
-      ))}
-  </div>
-</section>
+  <section id="about" class="container" aria-label="About and direction"></section>
+  <section id="projects" class="container" aria-label="Selected projects"></section>
+  <section id="services" class="container" aria-label="Services"></section>
+  <section id="writing" class="container" aria-label="Writing and notes"></section>
+  <section id="contact" class="container" aria-label="Contact and socials"></section>
 </BaseLayout>
 
 <style>
-  section {
-    padding-block: var(--space-4xl);
+  .hero {
+    min-height: 60vh;
+    display: grid;
+    align-items: center;
   }
 
-  .projects-list {
-    margin-top: var(--space-2xl);
+  h1 {
+    font-size: clamp(3rem, 10vw, 8rem);
+    font-weight: 700;
   }
 </style>
