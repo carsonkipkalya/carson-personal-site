@@ -1,0 +1,52 @@
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="site-name">Carson Kipkalya</a>
+
+    <nav aria-label="Main navigation">
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#services">Services</a>
+      <a href="#writing">Writing</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    padding: var(--space-lg) 0;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+  }
+
+  .site-name {
+    text-decoration: none;
+    font-weight: 400;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  nav a {
+    text-decoration: none;
+    color: var(--color-muted);
+  }
+
+  nav a:hover {
+    color: var(--color-text);
+  }
+
+  @media (max-width: 700px) {
+    nav {
+      display: none;
+    }
+  }
+</style>

@@ -1,43 +1,32 @@
-# Astro Starter Kit: Minimal
+# Carson Kipkalya — Personal Site
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Personal website and portfolio for Carson Kipkalya.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Project
 
-## 🚀 Project Structure
+This site is being built as a simple personal website, portfolio, and entry point for freelance work.
 
-Inside of your Astro project, you'll see the following folders and files:
+The current stack is:
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+- Astro
+- TypeScript
+- Plain CSS
+- Local content
+- Vercel for deployment
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Development
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Install dependencies:
 
-Any static assets, like images, can be placed in the `public/` directory.
+```bash
+npm install
 
-## 🧞 Commands
+Start the development server:
 
-All commands are run from the root of the project, from a terminal:
+```bash
+npm run dev
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+Build for production:
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```bash
+npm run build

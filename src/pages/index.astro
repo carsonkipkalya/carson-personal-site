@@ -1,17 +1,55 @@
 ---
+import { getCollection } from "astro:content";
 
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import Button from "../components/Button.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+
+const projects = await getCollection("projects");
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout>
+  <section id="about" class="container">
+    <SectionHeading
+  label="About"
+  title="A Little Context"
+/>
+
+    <p>
+      I'm interested in systems — code, markets, minds, organizations —
+      and what makes them work.
+    </p>
+
+    <Button href="#projects">See my work</Button>
+  </section>
+
+  <section id="projects" class="container">
+  <SectionHeading
+    label="Projects"
+    title="Things I've Built"
+  />
+
+  <div class="projects-list">
+    {projects
+      .filter((project) => project.data.featured)
+      .map((project) => (
+        <ProjectCard
+          title={project.data.title}
+          description={project.data.description}
+          tags={project.data.tags}
+        />
+      ))}
+  </div>
+</section>
+</BaseLayout>
+
+<style>
+  section {
+    padding-block: var(--space-4xl);
+  }
+
+  .projects-list {
+    margin-top: var(--space-2xl);
+  }
+</style>

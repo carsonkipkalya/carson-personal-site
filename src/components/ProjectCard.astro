@@ -1,0 +1,59 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  tags: string[];
+}
+
+const { title, description, tags } = Astro.props;
+---
+
+<article class="project-card">
+  <div class="project-content">
+    <h3>{title}</h3>
+
+    <p>{description}</p>
+
+    <ul class="tags" aria-label="Technologies used">
+      {tags.map((tag) => (
+        <li>{tag}</li>
+      ))}
+    </ul>
+  </div>
+</article>
+
+<style>
+  .project-card {
+    padding: var(--space-xl) 0;
+    border-top: 1px solid var(--color-muted);
+  }
+
+  .project-content {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  h3 {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 500;
+  }
+
+  p {
+    max-width: 60ch;
+    color: var(--color-muted);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tags li {
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+</style>
