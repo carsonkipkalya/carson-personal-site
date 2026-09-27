@@ -1,28 +1,391 @@
 ---
+import { getCollection, render } from "astro:content";
+
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/Button.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+
+const projects = await getCollection("projects");
+const writingEntries = await getCollection("writing");
+const writingNotes = await Promise.all(
+  writingEntries.map(async (entry) => ({
+    entry,
+    Content: (await render(entry)).Content,
+  })),
+);
 ---
 
 <BaseLayout>
-  <section id="hero" class="container hero" aria-label="Hero">
-    <h1>Carson Kipkalya</h1>
+  <section id="hero" class="container hero" aria-labelledby="hero-title">
+    <div class="hero-content">
+      <h1 id="hero-title">
+        Carson Kipkalya
+      </h1>
+      <p class="hero-supporting">
+        I study systems, build software, and spend a lot of my time reading about philosophy, and fiction. <br>Right now, most of what I build is practical — software projects, and websites for small businesses and startups.
+      </p>
+      <div class="hero-actions">
+  <Button href="#projects">View my work</Button>
+
+  <div class="hero-socials" aria-label="External links">
+    <a
+      href="YOUR_GITHUB_URL"
+      class="hero-social-link"
+      aria-label="GitHub — software projects"
+    >
+      <svg
+        class="hero-social-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 16 16"
+        aria-hidden="true"
+      >
+        <path
+          fill="currentColor"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59c.4.07.55-.17.55-.38c0-.19-.01-.82-.01-1.49c-2.01.37-2.53-.49-2.69-.94c-.09-.23-.48-.94-.82-1.13c-.28-.15-.68-.52-.01-.53c.63-.01 1.08.58 1.23.82c.72 1.21 1.87.87 2.33.66c.07-.52.28-.87.51-1.07c-1.78-.2-3.64-.89-3.64-3.95c0-.87.31-1.59.82-2.15c-.08-.2-.36-1.02.08-2.12c0 0 .67-.21 2.2.82c.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82c.44 1.1.16 1.92.08 2.12c.51.56.82 1.27.82 2.15c0 3.07-1.87 3.75-3.65 3.95c.29.25.54.73.54 1.48c0 1.07-.01 1.93-.01 2.2c0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"
+        />
+      </svg>
+      <span class="hero-social-label">Software projects</span>
+    </a>
+
+    <a
+      href="YOUR_X_URL"
+      class="hero-social-link"
+      aria-label="X — short-form thoughts"
+    >
+      <svg
+        class="hero-social-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 16 16"
+        aria-hidden="true"
+      >
+        <path
+          fill="currentColor"
+          d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07l-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"
+        />
+      </svg>
+      <span class="hero-social-label">Short-form thoughts</span>
+    </a>
+
+    <a
+      href="YOUR_SUBSTACK_URL"
+      class="hero-social-link"
+      aria-label="Substack — long-form writing"
+    >
+      <svg
+        class="hero-social-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 16 16"
+        aria-hidden="true"
+      >
+        <path
+          fill="currentColor"
+          d="M15 3.604H1v1.891h14v-1.89ZM1 7.208V16l7-3.926L15 16V7.208zM15 0H1v1.89h14z"
+        />
+      </svg>
+      <span class="hero-social-label">Long-form writing</span>
+    </a>
+  </div>
+</div>
+    </div>
   </section>
 
-  <section id="about" class="container" aria-label="About and direction"></section>
-  <section id="projects" class="container" aria-label="Selected projects"></section>
-  <section id="services" class="container" aria-label="Services"></section>
-  <section id="writing" class="container" aria-label="Writing and notes"></section>
-  <section id="contact" class="container" aria-label="Contact and socials"></section>
+  <section id="about" class="container about" aria-label="About and direction">
+    <SectionHeading
+      label="About"
+      title="A Little Context"
+    />
+
+  
+    <div class="about-content">
+      <p>I'm interested in how things work: I build software, client websites, and small experiments. Outside of code, I read a lot of fiction and philosophy, and I'm curious about design, storytelling, and human behavior. </p>
+      <p>I learn by moving between theory and practice. Some of my work is practical. Some of it is exploratory. Some of it is just me trying to understand something better.</p>
+      <p>Right now I'm focused on getting better at building useful things and communicating them clearly. I expect that focus to evolve as I find better questions to work on.</p>
+    </div>
+  </section>
+  <section id="projects" class="container" aria-label="Selected projects">
+    <SectionHeading label="Projects" title="Selected Work" />
+
+    <div class="projects-list">
+      {projects
+        .filter((project) => project.data.featured)
+        .map((project) => (
+          <ProjectCard
+            id={project.id}
+            title={project.data.title}
+            description={project.data.description}
+            tags={project.data.tags}
+            stack={project.data.stack}
+            artifact={project.data.artifact}
+            problem={project.data.problem}
+            approach={project.data.approach}
+            outcome={project.data.outcome}
+            links={project.data.links}
+          />
+        ))}
+    </div>
+  </section>
+  <section id="services" class="container services" aria-label="Services">
+    <SectionHeading
+      label="Services"
+      title="Websites and Landing Pages"
+    />
+    <div class="services-content">
+      <p>I build websites and landing pages for small businesses and startups.
+A good site should make it obvious what you offer, who it's for, and what a visitor should do next — that's what I focus on.
+      </p>
+      <p>
+        If you have something you're trying to communicate, I can help turn it into a site that does that.
+      </p>
+      <ul>
+        <li>Website and landing-page design</li>
+        <li>Responsive front-end development</li>
+        <li>Structuring and presenting your content</li>
+        <li>Turning an existing idea into a clear web presence</li>
+      </ul>
+      <div class="services-actions">
+        <Button href="#contact">Work with me</Button>
+      </div>
+    </div>
+  </section>
+  <section id="writing" class="container writing" aria-label="Writing and notes">
+    <SectionHeading label="Writing" title="Notes and Creative Work" />
+
+    <div class="writing-list">
+      {writingNotes.map(({ entry, Content }) => (
+        <article class="writing-entry">
+          <details>
+            <summary>
+              <span class="writing-title" role="heading" aria-level="3">{entry.data.title}</span>
+              <span class="writing-description">{entry.data.description}</span>
+              {entry.data.published && (
+                <time datetime={entry.data.published}>{entry.data.published}</time>
+              )}
+            </summary>
+            <div class="writing-content">
+              <Content />
+            </div>
+          </details>
+        </article>
+      ))}
+    </div>
+  </section>
+  <section id="contact" class="container contact" aria-label="Contact and socials">
+    <SectionHeading
+      label="Contact"
+      title="Let's Work Together"
+    />
+    <div class="contact-content">
+      <p>Interested in working together, talking about a project, or just comparing notes? Send me a message.</p>
+      <div class="contact-actions">
+        <Button href="#contact">Get in touch</Button>
+      </div>
+      <ul class="contact-links">
+        <li>
+          <a href="[PLACEHOLDER: destination URL]">Github</a>
+        </li>
+        <li>
+          <a href="[PLACEHOLDER: destination URL]">X</a>
+        </li>
+        <li>
+          <a href="[PLACEHOLDER: destination URL]">Substack</a>
+        </li>
+      </ul>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
   .hero {
-    min-height: 60vh;
     display: grid;
     align-items: center;
+    padding-block: clamp(var(--space-2xl), 10vh, var(--space-4xl));
   }
 
-  h1 {
-    font-size: clamp(3rem, 10vw, 8rem);
-    font-weight: 700;
+  .hero-content {
+    display: grid;
+    justify-items: start;
+    gap: 0;
+    max-width: 60rem;
   }
+
+
+  h1 {
+    max-width: 20ch;
+    margin-top: var(--space-md);
+    font-size: clamp(2.3rem, 6vw, 6rem);
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  .hero-supporting {
+    max-width: 50ch;
+    margin-top: var(--space-lg);
+    
+  }
+
+  .hero-actions {
+    margin-top: var(--space-xl);
+  }
+
+  .hero-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xl);
+  margin-top: var(--space-xl);
+}
+
+.hero-socials {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.hero-social-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.hero-social-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: block;
+  transition: transform 160ms ease;
+}
+
+.hero-social-link:hover .hero-social-icon {
+  transform: translateY(-2px);
+}
+
+.hero-social-link:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 4px;
+}
+
+.hero-social-label {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + var(--space-sm));
+  width: max-content;
+  max-width: 12rem;
+  transform: translateX(-50%) translateY(-4px);
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.hero-social-link:hover .hero-social-label,
+.hero-social-link:focus-visible .hero-social-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+  .about-content {
+    display: grid;
+    gap: var(--space-lg);
+    margin-top: var(--space-2xl);
+    max-width: 70ch;
+  }
+
+  .projects-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3xl);
+    margin-top: var(--space-2xl);
+  }
+
+  @media (min-width: 640px) {
+  .projects-list {
+    grid-template-columns: repeat(2, minmax(0, 30rem));
+    justify-content: center;
+  }
+}
+
+  .services-content {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-xl);
+    max-width: 65ch;
+    margin-top: var(--space-2xl);
+  }
+
+  .writing-list {
+    margin-top: var(--space-2xl);
+  }
+
+  .writing-entry {
+    padding-block: var(--space-lg);
+    border-top: 1px solid var(--color-muted);
+  }
+
+  .writing-entry summary {
+    display: grid;
+    gap: var(--space-sm);
+    cursor: pointer;
+  }
+
+  .writing-entry summary:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
+  .writing-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+    font-weight: 500;
+    line-height: 1.1;
+  }
+
+  .writing-description,
+  .writing-entry time {
+    max-width: 60ch;
+    color: var(--color-muted);
+  }
+
+  .writing-entry time {
+    font-size: 0.875rem;
+  }
+
+  .writing-content {
+    display: grid;
+    gap: var(--space-md);
+    max-width: 70ch;
+    margin-top: var(--space-lg);
+  }
+
+  .contact-content {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-lg);
+    max-width: 65ch;
+    margin-top: var(--space-2xl);
+  }
+
+  .contact-links {
+    display: grid;
+    gap: var(--space-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .contact-links a {
+    display: inline-flex;
+    max-width: 100%;
+    padding: var(--space-xs) 0;
+    overflow-wrap: anywhere;
+  }
+
+  .contact-links a:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
 </style>

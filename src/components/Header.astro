@@ -2,19 +2,82 @@
   <div class="container header-inner">
     <a href="/" class="site-name">Carson Kipkalya</a>
 
-    <nav aria-label="Main navigation">
-      <a href="#about">About</a>
-      <a href="#projects">Projects</a>
-      <a href="#services">Services</a>
-      <a href="#writing">Writing</a>
-      <a href="#contact">Contact</a>
-    </nav>
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-label="Open navigation menu"
+      aria-expanded="false"
+      aria-controls="site-navigation"
+      data-menu-toggle
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
+
+  <nav id="site-navigation" aria-label="Main navigation" hidden>
+    <ul class="container nav-list">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#writing">Writing</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
 </header>
+
+<script>
+  const menuToggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+  const navigation = document.querySelector<HTMLElement>("#site-navigation");
+
+  if (menuToggle && navigation) {
+    const closeMenu = (restoreFocus = false) => {
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.setAttribute("aria-label", "Open navigation menu");
+      navigation.hidden = true;
+
+      if (restoreFocus) menuToggle.focus({ preventScroll: true });
+    };
+
+    menuToggle.addEventListener("click", () => {
+      const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+      menuToggle.setAttribute("aria-expanded", String(!isOpen));
+      menuToggle.setAttribute(
+        "aria-label",
+        isOpen ? "Open navigation menu" : "Close navigation menu",
+      );
+      navigation.hidden = isOpen;
+
+      if (!isOpen) {
+        navigation.querySelector<HTMLAnchorElement>("a")?.focus();
+      }
+    });
+
+    navigation.addEventListener("click", (event) => {
+      if (event.target instanceof Element && event.target.closest("a")) {
+        closeMenu(true);
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menuToggle.getAttribute("aria-expanded") === "true") {
+        closeMenu(true);
+      }
+    });
+  }
+</script>
 
 <style>
   .site-header {
-    padding: var(--space-lg) 0;
+    position: fixed;
+    z-index: 10;
+    inset: 0 0 auto;
+    display: grid;
+    height: var(--site-header-height);
+    align-items: center;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-muted) 35%, transparent);
+    background: var(--color-background);
   }
 
   .header-inner {
@@ -25,28 +88,89 @@
   }
 
   .site-name {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 500;
     text-decoration: none;
-    font-weight: 400;
+  }
+
+  .menu-toggle {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    align-content: center;
+    justify-items: center;
+    gap: 5px;
+    padding: var(--space-xs);
+    border: 1px solid color-mix(in srgb, var(--color-muted) 50%, transparent);
+    border-radius: 0.25rem;
+    background: transparent;
+    color: var(--color-text);
+  }
+
+  .menu-toggle span {
+    width: 1.25rem;
+    height: 2px;
+    background: currentColor;
+    transition:
+      transform 160ms ease,
+      opacity 160ms ease;
+  }
+
+  .menu-toggle[aria-expanded="true"] span:first-child {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .menu-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-toggle[aria-expanded="true"] span:last-child {
+    transform: translateY(-7px) rotate(-45deg);
   }
 
   nav {
-    display: flex;
-    align-items: center;
-    gap: var(--space-lg);
+    position: absolute;
+    inset: 100% 0 auto;
+    padding-block: var(--space-md);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-muted) 35%, transparent);
+    background: var(--color-background);
+  }
+
+  nav[hidden] {
+    display: none;
+  }
+
+  .nav-list {
+    display: grid;
+    gap: var(--space-xs);
+    margin-block: 0;
+    padding-block: 0;
+    padding-inline: 0;
+    list-style: none;
   }
 
   nav a {
-    text-decoration: none;
+    display: block;
+    width: fit-content;
+    padding: var(--space-sm) 0;
     color: var(--color-muted);
+    text-decoration: none;
   }
 
   nav a:hover {
     color: var(--color-text);
   }
 
-  @media (max-width: 700px) {
-    nav {
-      display: none;
+  .menu-toggle:focus-visible,
+  nav a:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu-toggle span {
+      transition: none;
     }
   }
 </style>

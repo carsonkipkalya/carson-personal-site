@@ -1,49 +1,296 @@
 ---
 interface Props {
+  id: string;
   title: string;
   description: string;
   tags: string[];
+  stack?: string[];
+  artifact?: {
+    src: string;
+    alt: string;
+  };
+  problem: string;
+  approach: string;
+  outcome: string;
+  links?: {
+    live?: string;
+    github?: string;
+  };
 }
 
-const { title, description, tags } = Astro.props;
+const { id, title, description, tags, stack, artifact, problem, approach, outcome, links } = Astro.props;
+const detailsId = `${id}-details`;
+const titleId = `${id}-details-title`;
 ---
 
 <article class="project-card">
-  <div class="project-content">
-    <h3>{title}</h3>
+  <button
+    class="project-card-toggle"
+    type="button"
+    aria-label={`Open project details for ${title}`}
+    aria-haspopup="dialog"
+    aria-expanded="false"
+    aria-controls={detailsId}
+    data-project-open
+  >
+    <span class="project-card-artifact">
+      {artifact ? (
+        <img src={artifact.src} alt={artifact.alt} loading="lazy" />
+      ) : (
+        <span class="artifact-placeholder">Project artifact</span>
+      )}
+    </span>
+    <span class="project-card-content">
+      <span class="project-title" role="heading" aria-level="3">{title}</span>
+      <span class="project-description">{description}</span>
 
-    <p>{description}</p>
+      {tags.length > 0 && (
+        <span class="tags" role="list" aria-label="Project tags">
+          {tags.map((tag) => (
+            <span role="listitem">{tag}</span>
+          ))}
+        </span>
+      )}
+    </span>
+  </button>
 
-    <ul class="tags" aria-label="Technologies used">
-      {tags.map((tag) => (
-        <li>{tag}</li>
-      ))}
-    </ul>
-  </div>
+  <dialog
+    class="project-dialog"
+    id={detailsId}
+    aria-labelledby={titleId}
+    data-project-dialog
+  >
+    <button
+  class="project-close"
+  type="button"
+  aria-label={`Close details for ${title}`}
+  data-project-close
+>
+  <svg
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M6 6l12 12M18 6L6 18" />
+  </svg>
+</button>
+  <div class="project-detail-content">
+      <h3 id={titleId}>{title}</h3>
+      <div class="project-detail-section">
+        <h4>Detailed description</h4>
+        <p>{description}</p>
+      </div>
+      <div class="project-detail-section">
+        <h4>Problem explored</h4>
+        <p>{problem}</p>
+      </div>
+      <div class="project-detail-section">
+        <h4>Solution</h4>
+        <p>{approach}</p>
+      </div>
+      <div class="project-detail-section">
+        <h4>Lesson learned</h4>
+        <p>{outcome}</p>
+      </div>
+      {stack && stack.length > 0 && (
+        <div class="project-detail-section">
+          <h4>Full stack</h4>
+          <p>{stack.join(", ")}</p>
+        </div>
+      )}
+      {(links?.live || links?.github) && (
+        <ul class="project-links" aria-label="Project links">
+          {links.live && <li><a href={links.live}>Live site</a></li>}
+          {links.github && <li><a href={links.github}>GitHub repository</a></li>}
+        </ul>
+      )}
+    </div>
+  </dialog>
 </article>
+
+<script>
+  const projectCards = document.querySelectorAll<HTMLElement>(".project-card");
+  let activeDialog: HTMLDialogElement | null = null;
+  let previousOverflow = "";
+
+  for (const card of projectCards) {
+    const openButton = card.querySelector<HTMLButtonElement>("[data-project-open]");
+    const dialog = card.querySelector<HTMLDialogElement>("[data-project-dialog]");
+    const closeButton = card.querySelector<HTMLButtonElement>("[data-project-close]");
+
+    if (!openButton || !dialog || !closeButton) continue;
+
+    let transition: Animation | undefined;
+    let isClosing = false;
+
+    const closeProject = () => {
+      if (!dialog.open || isClosing) return;
+
+      isClosing = true;
+      dialog.classList.add("is-closing");
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !transition) {
+        dialog.close();
+        return;
+      }
+
+      transition.onfinish = () => dialog.close();
+      transition.reverse();
+    };
+
+    openButton.addEventListener("click", () => {
+      if (activeDialog || dialog.open) return;
+
+      const cardRect = card.getBoundingClientRect();
+      previousOverflow = document.documentElement.style.overflow;
+      dialog.showModal();
+      const detailContent = dialog.querySelector<HTMLElement>(".project-detail-content");
+      detailContent?.scrollTo({ top: 0, behavior: "instant" });
+      
+      activeDialog = dialog;
+      document.documentElement.style.overflow = "hidden";
+      openButton.setAttribute("aria-expanded", "true");
+      closeButton.focus({ preventScroll: true });
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const dialogRect = dialog.getBoundingClientRect();
+      const offsetX = cardRect.left + cardRect.width / 2 - (dialogRect.left + dialogRect.width / 2);
+      const offsetY = cardRect.top + cardRect.height / 2 - (dialogRect.top + dialogRect.height / 2);
+      const scaleX = cardRect.width / dialogRect.width;
+      const scaleY = cardRect.height / dialogRect.height;
+
+      transition = dialog.animate(
+        [
+          { transform: `translate(${offsetX}px, ${offsetY}px) scale(${scaleX}, ${scaleY})` },
+          { transform: "translate(0, 0) scale(1, 1)" },
+        ],
+        {
+          duration: 280,
+          easing: "cubic-bezier(0.2, 0.75, 0.25, 1)",
+          fill: "both",
+        },
+      );
+    });
+
+    closeButton.addEventListener("click", closeProject);
+
+    dialog.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      closeProject();
+    });
+
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) closeProject();
+    });
+
+    dialog.addEventListener("close", () => {
+      transition?.cancel();
+      transition = undefined;
+      dialog.classList.remove("is-closing");
+      openButton.setAttribute("aria-expanded", "false");
+      document.documentElement.style.overflow = previousOverflow;
+      activeDialog = null;
+      openButton.focus({ preventScroll: true });
+      isClosing = false;
+    });
+  }
+</script>
 
 <style>
   .project-card {
-    padding: var(--space-xl) 0;
-    border-top: 1px solid var(--color-muted);
+    border: 1px solid color-mix(in srgb, var(--color-muted) 38%, var(--color-background));
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--color-text) 4%, var(--color-background));
+    box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 16%);background: color-mix(in srgb, var(--color-text) 4%, var(--color-background));
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
   }
 
-  .project-content {
+  .project-card:hover {
+  border-color: var(--color-muted);
+  box-shadow: 0 0 16px rgb(229 244 227 / 35%);
+}
+
+  .project-card-toggle {
     display: grid;
     gap: var(--space-md);
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
   }
 
-  h3 {
+  .project-card-toggle:focus-visible,
+  .project-close:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
+
+  .project-card-artifact {
+  aspect-ratio: 2.5 / 1;
+  overflow: hidden;
+}
+
+.project-card-artifact img,
+.artifact-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  background: var(--color-text);
+}
+
+.project-card-artifact img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.75rem 0.75rem 0 0;
+  object-position: center 60%;
+}
+
+.project-card-content {
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+  min-width:0 ;
+  padding: var(--space-lg);
+}
+
+
+  .artifact-placeholder {
+    display: grid;
+    place-items: center;
+    color: var(--color-muted);
+    background: color-mix(in srgb, var(--color-muted) 10%, var(--color-background));
+  }
+
+  .project-title {
+    text-transform: lowercase;
+  }
+
+  .project-title,
+  .project-dialog h3 {
+    font-family: var(--font-heading);
     font-size: clamp(1.5rem, 2.5vw, 2rem);
     font-weight: 500;
+    line-height: 1.1;
   }
 
-  p {
+  .project-description,
+  .project-dialog p {
     max-width: 60ch;
-    color: var(--color-muted);
+    color: var(--color-text);
   }
 
-  .tags {
+  .tags,
+  .project-links {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-sm);
@@ -52,8 +299,125 @@ const { title, description, tags } = Astro.props;
     list-style: none;
   }
 
-  .tags li {
+  .project-links {
     color: var(--color-muted);
     font-size: 0.875rem;
+  }
+
+  .tags span {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-muted);
+  border-radius: 0.25rem;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+  .project-dialog {
+    position: fixed;
+    inset: 0;
+    width: min(54rem, calc(100vw - var(--space-xl)));
+    height: min(78svh, 52rem);
+    max-height: calc(100svh - var(--space-xl));
+    margin: auto;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--color-muted) 55%, var(--color-background));
+    border-radius: 0.75rem;
+    background: var(--color-background);
+    color: var(--color-text);
+    box-shadow: 0 1.5rem 5rem rgb(0 0 0 / 45%);
+    transform-origin: center;
+  }
+
+  .project-dialog::backdrop {
+    background-color: rgb(0 0 0 / 68%);
+    backdrop-filter: blur(5px);
+    transition:
+      background-color 280ms ease,
+      backdrop-filter 280ms ease;
+  }
+
+  @starting-style {
+    .project-dialog[open]::backdrop {
+      background-color: transparent;
+      backdrop-filter: blur(0);
+    }
+  }
+
+  .project-dialog.is-closing::backdrop {
+    background-color: transparent;
+    backdrop-filter: blur(0);
+  }
+
+  .project-detail-content {
+    display: grid;
+    align-content: start;
+    gap: var(--space-xl);
+    height: 100%;
+    padding: clamp(var(--space-lg), 5vw, var(--space-2xl));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .project-detail-section {
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  .project-detail-section h4 {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+
+  .project-links {
+    gap: var(--space-lg);
+  }
+
+  .project-close {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  z-index: 1;
+
+  display: grid;
+  place-items: center;
+
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+
+  cursor: pointer;
+
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.project-close:hover {
+  transform: scale(1.15);
+}
+
+.project-close svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+  @media (prefers-reduced-motion: reduce) {
+    .project-card {
+      transition: none;
+    }
+
+    .project-dialog::backdrop {
+      transition: none;
+    }
   }
 </style>

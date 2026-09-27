@@ -12,6 +12,7 @@
   /* Layout */
   --container-width: 1200px;
   --page-padding: 24px;
+  --site-header-height: 4.5rem;
 
   /* Spacing */
   --space-xs: 0.5rem;
@@ -38,11 +39,12 @@ html {
 
 body {
   margin: 0;
+  padding-top: var(--site-header-height);
   background: var(--color-background);
   color: var(--color-text);
   font-family: var(--font-body);
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.2;
 }
 
 img,
@@ -79,6 +81,7 @@ h4 {
 
 p {
   margin: 0;
+  font-size: clamp(1.125rem, 2.5vw, 1.4rem);
 }
 
 /* Layout */
@@ -93,6 +96,7 @@ p {
 
 section {
   padding-block: var(--space-4xl);
+  scroll-margin-top: calc(var(--site-header-height) + var(--space-md));
 }
 
 /* Accessibility */

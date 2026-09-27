@@ -10,7 +10,19 @@ const projects = defineCollection({
     title: z.string(),
     description: z.string(),
     tags: z.array(z.string()),
+    stack: z.array(z.string()).optional(),
     featured: z.boolean().default(false),
+    artifact: z.object({
+      src: z.string(),
+      alt: z.string(),
+    }).optional(),
+    problem: z.string(),
+    approach: z.string(),
+    outcome: z.string(),
+    links: z.object({
+      live: z.string().url().optional(),
+      github: z.string().url().optional(),
+    }).optional(),
   }),
 });
 
