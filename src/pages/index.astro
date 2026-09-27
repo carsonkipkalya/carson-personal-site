@@ -3,17 +3,24 @@ import { getCollection, render } from "astro:content";
 
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Button from "../components/Button.astro";
+import ExpandablePost from "../components/ExpandablePost.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 
 const projects = await getCollection("projects");
 const writingEntries = await getCollection("writing");
-const writingNotes = await Promise.all(
-  writingEntries.map(async (entry) => ({
+const renderWritingEntries = async (entries: typeof writingEntries) =>
+  Promise.all(entries.map(async (entry) => ({
     entry,
     Content: (await render(entry)).Content,
-  })),
+  })));
+const writingNotes = await renderWritingEntries(
+  writingEntries.filter((entry) => entry.data.type === "note"),
 );
+const writingCreativeWorks = await renderWritingEntries(
+  writingEntries.filter((entry) => entry.data.type !== "note"),
+);
+const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.length > 0;
 ---
 
 <BaseLayout>
@@ -151,23 +158,47 @@ A good site should make it obvious what you offer, who it's for, and what a visi
   <section id="writing" class="container writing" aria-label="Writing and notes">
     <SectionHeading label="Writing" title="Notes and Creative Work" />
 
-    <div class="writing-list">
-      {writingNotes.map(({ entry, Content }) => (
-        <article class="writing-entry">
-          <details>
-            <summary>
-              <span class="writing-title" role="heading" aria-level="3">{entry.data.title}</span>
-              <span class="writing-description">{entry.data.description}</span>
-              {entry.data.published && (
-                <time datetime={entry.data.published}>{entry.data.published}</time>
-              )}
-            </summary>
-            <div class="writing-content">
-              <Content />
-            </div>
-          </details>
-        </article>
-      ))}
+    <div class:list={["writing-groups", { "writing-groups--two": hasBothWritingGroups }]}>
+      {writingNotes.length > 0 && (
+        <section class="writing-group" aria-labelledby="writing-notes-title">
+          <h3 id="writing-notes-title">Notes</h3>
+          <div class="writing-group-list">
+            {writingNotes.map(({ entry, Content }) => (
+              <ExpandablePost
+                id={entry.id}
+                title={entry.data.title}
+                description={entry.data.description}
+                contentType={entry.data.type}
+                publishedOn={entry.data.publishedOn}
+                publishedDate={entry.data.publishedDate}
+                externalUrl={entry.data.externalUrl}
+              >
+                <Content />
+              </ExpandablePost>
+            ))}
+          </div>
+        </section>
+      )}
+      {writingCreativeWorks.length > 0 && (
+        <section class="writing-group" aria-labelledby="writing-creative-title">
+          <h3 id="writing-creative-title">Creative Work</h3>
+          <div class="writing-group-list">
+            {writingCreativeWorks.map(({ entry, Content }) => (
+              <ExpandablePost
+                id={entry.id}
+                title={entry.data.title}
+                description={entry.data.description}
+                contentType={entry.data.type}
+                publishedOn={entry.data.publishedOn}
+                publishedDate={entry.data.publishedDate}
+                externalUrl={entry.data.externalUrl}
+              >
+                <Content />
+              </ExpandablePost>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   </section>
   <section id="contact" class="container contact" aria-label="Contact and socials">
@@ -176,19 +207,81 @@ A good site should make it obvious what you offer, who it's for, and what a visi
       title="Let's Work Together"
     />
     <div class="contact-content">
-      <p>Interested in working together, talking about a project, or just comparing notes? Send me a message.</p>
-      <div class="contact-actions">
-        <Button href="#contact">Get in touch</Button>
+      <div class="contact-primary">
+        <p>Interested in working together, talking about a project, or just comparing notes? Send me a message.</p>
+        <div class="contact-actions">
+          <Button href="#contact">Get in touch</Button>
+        </div>
       </div>
       <ul class="contact-links">
         <li>
-          <a href="[PLACEHOLDER: destination URL]">Github</a>
+          <a class="contact-card" href="[PLACEHOLDER: destination URL]">
+            <svg
+              class="hero-social-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                fill="currentColor"
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59c.4.07.55-.17.55-.38c0-.19-.01-.82-.01-1.49c-2.01.37-2.53-.49-2.69-.94c-.09-.23-.48-.94-.82-1.13c-.28-.15-.68-.52-.01-.53c.63-.01 1.08.58 1.23.82c.72 1.21 1.87.87 2.33.66c.07-.52.28-.87.51-1.07c-1.78-.2-3.64-.89-3.64-3.95c0-.87.31-1.59.82-2.15c-.08-.2-.36-1.02.08-2.12c0 0 .67-.21 2.2.82c.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82c.44 1.1.16 1.92.08 2.12c.51.56.82 1.27.82 2.15c0 3.07-1.87 3.75-3.65 3.95c.29.25.54.73.54 1.48c0 1.07-.01 1.93-.01 2.2c0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"
+              />
+            </svg>
+            <span class="contact-card-copy">
+              <span class="contact-card-name">Github</span>
+              <span class="contact-card-description">Software projects</span>
+            </span>
+            <svg class="contact-card-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 12" aria-hidden="true" focusable="false">
+              <path d="M2 6h11M9 2l4 4-4 4" />
+            </svg>
+          </a>
         </li>
         <li>
-          <a href="[PLACEHOLDER: destination URL]">X</a>
+          <a class="contact-card" href="[PLACEHOLDER: destination URL]">
+            <svg
+              class="hero-social-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                fill="currentColor"
+                d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07l-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"
+              />
+            </svg>
+            <span class="contact-card-copy">
+              <span class="contact-card-name">X</span>
+              <span class="contact-card-description">Short-form thoughts</span>
+            </span>
+            <svg class="contact-card-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 12" aria-hidden="true" focusable="false">
+              <path d="M2 6h11M9 2l4 4-4 4" />
+            </svg>
+          </a>
         </li>
         <li>
-          <a href="[PLACEHOLDER: destination URL]">Substack</a>
+          <a class="contact-card" href="[PLACEHOLDER: destination URL]">
+            <svg
+              class="hero-social-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                fill="currentColor"
+                d="M15 3.604H1v1.891h14v-1.89ZM1 7.208V16l7-3.926L15 16V7.208zM15 0H1v1.89h14z"
+              />
+            </svg>
+            <span class="contact-card-copy">
+              <span class="contact-card-name">Substack</span>
+              <span class="contact-card-description">Long-form writing</span>
+            </span>
+            <svg class="contact-card-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 12" aria-hidden="true" focusable="false">
+              <path d="M2 6h11M9 2l4 4-4 4" />
+            </svg>
+          </a>
         </li>
       </ul>
     </div>
@@ -316,76 +409,137 @@ A good site should make it obvious what you offer, who it's for, and what a visi
     margin-top: var(--space-2xl);
   }
 
-  .writing-list {
+  .writing-groups {
+    display: grid;
+    gap: var(--space-2xl);
     margin-top: var(--space-2xl);
   }
 
-  .writing-entry {
-    padding-block: var(--space-lg);
-    border-top: 1px solid var(--color-muted);
-  }
-
-  .writing-entry summary {
+  .writing-group {
     display: grid;
-    gap: var(--space-sm);
-    cursor: pointer;
+    align-content: start;
+    gap: var(--space-lg);
   }
 
-  .writing-entry summary:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 4px;
-  }
-
-  .writing-title {
-    font-family: var(--font-heading);
-    font-size: clamp(1.25rem, 2.2vw, 1.75rem);
-    font-weight: 500;
-    line-height: 1.1;
-  }
-
-  .writing-description,
-  .writing-entry time {
-    max-width: 60ch;
+  .writing-group h3 {
+    margin: 0;
     color: var(--color-muted);
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 500;
   }
 
-  .writing-entry time {
-    font-size: 0.875rem;
-  }
-
-  .writing-content {
+  .writing-group-list {
     display: grid;
+    align-content: start;
     gap: var(--space-md);
-    max-width: 70ch;
-    margin-top: var(--space-lg);
+  }
+
+  @media (min-width: 640px) {
+    .writing-groups--two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   .contact-content {
     display: grid;
-    justify-items: start;
-    gap: var(--space-lg);
-    max-width: 65ch;
+    gap: var(--space-2xl);
     margin-top: var(--space-2xl);
+  }
+
+  .contact-primary {
+    display: grid;
+    justify-items: start;
+    align-content: start;
+    gap: var(--space-lg);
+  }
+
+  .contact-primary p {
+    max-width: 65ch;
   }
 
   .contact-links {
     display: grid;
-    gap: var(--space-sm);
+    gap: var(--space-md);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .contact-links a {
-    display: inline-flex;
+  .contact-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
     max-width: 100%;
-    padding: var(--space-xs) 0;
+    padding: var(--space-md);
+    border: 1px solid color-mix(in srgb, var(--color-muted) 38%, var(--color-background));
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--color-text) 4%, var(--color-background));
+    color: var(--color-text);
+    text-decoration: none;
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .contact-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-muted);
+    box-shadow: 0 0 16px rgb(229 244 227 / 35%);
+  }
+
+  .contact-card:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
+  .contact-card .hero-social-icon {
+    flex: 0 0 auto;
+  }
+
+  .contact-card-arrow {
+    flex: 0 0 auto;
+    width: 1rem;
+    height: 0.7rem;
+    margin-left: auto;
+    overflow: visible;
+    fill: none;
+    stroke: var(--color-muted);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1;
+    transition: transform 180ms ease;
+  }
+
+  .contact-card:hover .contact-card-arrow {
+    transform: translateX(2px);
+  }
+
+  .contact-card-copy {
+    display: grid;
+    gap: var(--space-xs);
     overflow-wrap: anywhere;
   }
 
-  .contact-links a:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 4px;
+  .contact-card-name {
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.1;
+  }
+
+  .contact-card-description {
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+
+  @media (min-width: 640px) {
+    .contact-content {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+      align-items: start;
+      gap: var(--space-2xl);
+    }
   }
 
 </style>

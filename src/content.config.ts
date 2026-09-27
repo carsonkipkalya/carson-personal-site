@@ -34,7 +34,10 @@ const writing = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    published: z.string().optional(),
+    type: z.string(),
+    publishedOn: z.string().optional(),
+    publishedDate: z.string().optional(),
+    externalUrl: z.string().url().optional(),
   }),
 });
 

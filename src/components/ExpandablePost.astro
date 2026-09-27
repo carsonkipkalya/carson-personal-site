@@ -1,0 +1,319 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  description: string;
+  contentType: string;
+  publishedOn?: string;
+  publishedDate?: string;
+  externalUrl?: string;
+}
+
+const { id, title, description, contentType, publishedOn, publishedDate, externalUrl } = Astro.props;
+const dialogId = `${id}-writing-dialog`;
+const titleId = `${id}-writing-title`;
+---
+
+<article class="writing-card">
+  <button
+    class="writing-card-toggle"
+    type="button"
+    aria-label={`Open writing: ${title}`}
+    aria-haspopup="dialog"
+    aria-expanded="false"
+    aria-controls={dialogId}
+    data-writing-open
+  >
+    <span class="writing-card-title" role="heading" aria-level="4">{title}</span>
+    <span class="writing-card-description">{description}</span>
+    <span class="writing-card-type">{contentType}</span>
+  </button>
+
+  <dialog
+    class="writing-dialog"
+    id={dialogId}
+    aria-labelledby={titleId}
+    data-writing-dialog
+  >
+    <div class="writing-dialog-content">
+      <button
+        class="writing-close"
+        type="button"
+        aria-label={`Close writing: ${title}`}
+        data-writing-close
+      >
+        Close
+      </button>
+      <header class="writing-dialog-header">
+        <h2 id={titleId}>{title}</h2>
+        <p class="writing-card-description">{description}</p>
+        <span class="writing-card-type">{contentType}</span>
+      </header>
+      <div class="writing-body">
+        <slot />
+      </div>
+      {(publishedOn || publishedDate || externalUrl) && (
+        <div class="writing-publication">
+          {publishedOn && <p>Originally published on {publishedOn}</p>}
+          {publishedDate && <time datetime={publishedDate}>{publishedDate}</time>}
+          {externalUrl && (
+            <a href={externalUrl}>
+              Read {publishedOn ? `on ${publishedOn}` : "original"} →
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  </dialog>
+</article>
+
+<script>
+  const writingCards = document.querySelectorAll<HTMLElement>(".writing-card");
+  let activeDialog: HTMLDialogElement | null = null;
+  let previousOverflow = "";
+
+  for (const card of writingCards) {
+    const openButton = card.querySelector<HTMLButtonElement>("[data-writing-open]");
+    const dialog = card.querySelector<HTMLDialogElement>("[data-writing-dialog]");
+    const closeButton = card.querySelector<HTMLButtonElement>("[data-writing-close]");
+
+    if (!openButton || !dialog || !closeButton) continue;
+
+    let transition: Animation | undefined;
+    let isClosing = false;
+
+    const closeWriting = () => {
+      if (!dialog.open || isClosing) return;
+
+      isClosing = true;
+      dialog.classList.add("is-closing");
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !transition) {
+        dialog.close();
+        return;
+      }
+
+      transition.onfinish = () => dialog.close();
+      transition.reverse();
+    };
+
+    openButton.addEventListener("click", () => {
+      if (activeDialog || dialog.open) return;
+
+      const cardRect = card.getBoundingClientRect();
+      previousOverflow = document.documentElement.style.overflow;
+      dialog.showModal();
+      dialog.querySelector<HTMLElement>(".writing-dialog-content")?.scrollTo({
+        top: 0,
+        behavior: "instant",
+      });
+
+      activeDialog = dialog;
+      document.documentElement.style.overflow = "hidden";
+      openButton.setAttribute("aria-expanded", "true");
+      closeButton.focus({ preventScroll: true });
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const dialogRect = dialog.getBoundingClientRect();
+      const offsetX = cardRect.left + cardRect.width / 2 - (dialogRect.left + dialogRect.width / 2);
+      const offsetY = cardRect.top + cardRect.height / 2 - (dialogRect.top + dialogRect.height / 2);
+      const scaleX = cardRect.width / dialogRect.width;
+      const scaleY = cardRect.height / dialogRect.height;
+
+      transition = dialog.animate(
+        [
+          { transform: `translate(${offsetX}px, ${offsetY}px) scale(${scaleX}, ${scaleY})` },
+          { transform: "translate(0, 0) scale(1, 1)" },
+        ],
+        {
+          duration: 280,
+          easing: "cubic-bezier(0.2, 0.75, 0.25, 1)",
+          fill: "both",
+        },
+      );
+    });
+
+    closeButton.addEventListener("click", closeWriting);
+
+    dialog.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      closeWriting();
+    });
+
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) closeWriting();
+    });
+
+    dialog.addEventListener("close", () => {
+      transition?.cancel();
+      transition = undefined;
+      dialog.classList.remove("is-closing");
+      openButton.setAttribute("aria-expanded", "false");
+      document.documentElement.style.overflow = previousOverflow;
+      activeDialog = null;
+      openButton.focus({ preventScroll: true });
+      isClosing = false;
+    });
+  }
+</script>
+
+<style>
+  .writing-card {
+    border: 1px solid color-mix(in srgb, var(--color-muted) 38%, var(--color-background));
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--color-text) 4%, var(--color-background));
+    box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 16%);
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .writing-card:hover {
+    border-color: var(--color-muted);
+    box-shadow: 0 0 16px rgb(229 244 227 / 35%);
+  }
+
+  .writing-card-toggle {
+    display: grid;
+    width: 100%;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .writing-card-toggle:focus-visible,
+  .writing-close:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
+  .writing-card-title,
+  .writing-dialog h2 {
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+    font-weight: 500;
+    line-height: 1.1;
+  }
+
+  .writing-card-description {
+    max-width: 60ch;
+    margin: 0;
+    color: var(--color-muted);
+  }
+
+  .writing-card-type {
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+
+  .writing-dialog {
+    position: fixed;
+    inset: 0;
+    width: min(54rem, calc(100vw - var(--space-xl)));
+    height: min(78svh, 52rem);
+    max-height: calc(100svh - var(--space-xl));
+    margin: auto;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--color-muted) 55%, var(--color-background));
+    border-radius: 0.75rem;
+    background: var(--color-background);
+    color: var(--color-text);
+    box-shadow: 0 1.5rem 5rem rgb(0 0 0 / 45%);
+    transform-origin: center;
+  }
+
+  .writing-dialog::backdrop {
+    background-color: rgb(0 0 0 / 68%);
+    backdrop-filter: blur(5px);
+    transition:
+      background-color 280ms ease,
+      backdrop-filter 280ms ease;
+  }
+
+  @starting-style {
+    .writing-dialog[open]::backdrop {
+      background-color: transparent;
+      backdrop-filter: blur(0);
+    }
+  }
+
+  .writing-dialog.is-closing::backdrop {
+    background-color: transparent;
+    backdrop-filter: blur(0);
+  }
+
+  .writing-dialog-content {
+    display: grid;
+    align-content: start;
+    gap: var(--space-xl);
+    height: 100%;
+    padding: clamp(var(--space-lg), 5vw, var(--space-2xl));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .writing-dialog-header {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .writing-dialog-header h2 {
+    margin: 0;
+  }
+
+  .writing-body {
+    display: grid;
+    gap: var(--space-md);
+    max-width: 70ch;
+  }
+
+  .writing-publication {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-xs);
+    color: var(--color-muted);
+  }
+
+  .writing-publication p {
+    margin: 0;
+  }
+
+  .writing-publication a {
+    color: inherit;
+  }
+
+  .writing-close {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    z-index: 1;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-accent);
+    cursor: pointer;
+    transition: transform 180ms ease, color 180ms ease;
+  }
+
+  .writing-close:hover {
+    transform: scale(1.15);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .writing-card {
+      transition: none;
+    }
+
+    .writing-dialog::backdrop {
+      transition: none;
+    }
+  }
+</style>
