@@ -1,5 +1,5 @@
 <header class="site-header">
-  <div class="container header-inner">
+  <div class="header-inner">
     <a href="/" class="site-name">C.K.</a>
 
     <nav id="site-navigation" aria-label="Main navigation" hidden>
@@ -56,7 +56,7 @@
       menuToggle.setAttribute("aria-expanded", "false");
       menuToggle.setAttribute("aria-label", "Open navigation menu");
       header?.classList.remove("is-open");
-      document.body.classList.remove("mobile-menu-open");
+      document.body.classList.remove("menu-open");
 
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         navigation.hidden = true;
@@ -96,7 +96,7 @@
       menuToggle.setAttribute("aria-expanded", "true");
       menuToggle.setAttribute("aria-label", "Close navigation menu");
       header?.classList.add("is-open");
-      document.body.classList.add("mobile-menu-open");
+      document.body.classList.add("menu-open");
       navigation.querySelector<HTMLAnchorElement>("a")?.focus();
     });
 
@@ -127,10 +127,10 @@
   .site-header {
     position: fixed;
     z-index: 10;
-    top: var(--space-md);
+    top: var(--space-xl);
     left: 50%;
     width: min(calc(100% - (var(--page-padding) * 2)), var(--container-width));
-    height: var(--site-header-height);
+    height: var(--space-2xl);
     transform: translateX(-50%);
     border: 1px solid var(--color-muted);
     border-radius: 0.75rem;
@@ -142,8 +142,8 @@
     height: 100%;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-md);
-    padding-inline: var(--space-md);
+    padding-inline: var(--space-sm);
+    gap: var(--space-lg);
   }
 
   .site-name {
@@ -242,6 +242,10 @@
     color: var(--color-text);
   }
 
+  :global(body.menu-open) {
+      overflow: hidden;
+    }
+
   @media (max-width: 640px) {
     .header-inner {
       gap: var(--space-xs);
@@ -284,7 +288,7 @@
       opacity: 1;
     }
 
-    :global(body.mobile-menu-open::before) {
+    :global(body.menu-open::before) {
       position: fixed;
       z-index: 9;
       inset: 0;
@@ -294,6 +298,7 @@
       content: "";
       pointer-events: none;
     }
+
 
     .nav-list {
       display: grid;

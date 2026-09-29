@@ -95,7 +95,7 @@ p {
 }
 
 section {
-  padding-block: var(--space-4xl);
+  padding-block: var(--space-2xl);
   scroll-margin-top: calc(var(--site-header-height) + var(--space-md));
 }
 

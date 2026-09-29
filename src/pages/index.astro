@@ -139,10 +139,10 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
     />
     <div class="services-content">
       <p>I build websites and landing pages for small businesses and startups.
-A good site should make it obvious what you offer, who it's for, and what a visitor should do next — that's what I focus on.
+          A good site should make it obvious what you offer, who it's for, and what a visitor should do next — that's what I focus on.
       </p>
       <p>
-        If you have something you're trying to communicate, I can help turn it into a site that does that.
+          If you have something you're trying to communicate, I can help turn it into a site that does that.
       </p>
       <ul>
         <li>Website and landing-page design</li>
@@ -150,9 +150,10 @@ A good site should make it obvious what you offer, who it's for, and what a visi
         <li>Structuring and presenting your content</li>
         <li>Turning an existing idea into a clear web presence</li>
       </ul>
+
       <div class="services-actions">
-        <Button href="#contact">Work with me</Button>
-      </div>
+          <Button href="#contact">Work with me</Button>
+        </div>
     </div>
   </section>
   <section id="writing" class="container writing" aria-label="Writing and notes">
@@ -292,21 +293,29 @@ A good site should make it obvious what you offer, who it's for, and what a visi
   .hero {
     display: grid;
     align-items: center;
-    padding-block: clamp(var(--space-2xl), 10vh, var(--space-4xl));
+    padding-block: var(--space-2xl);
   }
 
   .hero-content {
     display: grid;
-    justify-items: start;
+    justify-items: center;
     gap: 0;
     max-width: 60rem;
+    margin-inline: auto;
   }
+
+  @media (min-width: 640px) {
+  .hero-content {
+    justify-items: start;
+    margin-inline: 0;
+  }
+}
 
 
   h1 {
     max-width: 20ch;
     margin-top: var(--space-md);
-    font-size: clamp(2.3rem, 6vw, 6rem);
+    font-size: clamp(2.375rem, 6vw, 6rem);
     font-weight: 700;
     text-wrap: balance;
   }
@@ -317,15 +326,12 @@ A good site should make it obvious what you offer, who it's for, and what a visi
     
   }
 
-  .hero-actions {
-    margin-top: var(--space-xl);
-  }
 
   .hero-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-2xl);
-  margin-top: var(--space-xl);
+  gap: var(--space-xl);
+  margin-top: var(--space-lg);
 }
 
 .hero-socials {
@@ -403,11 +409,74 @@ A good site should make it obvious what you offer, who it's for, and what a visi
 
   .services-content {
     display: grid;
-    justify-items: start;
     gap: var(--space-xl);
     max-width: 65ch;
     margin-top: var(--space-2xl);
   }
+
+  .services-actions {
+  justify-self: center;
+  }
+
+
+  .services-content ul {
+  display: grid;
+  gap: var(--space-md);
+  margin: 0;
+  padding: var(--space-lg);
+  border: 1px solid color-mix(
+    in srgb,
+    var(--color-muted) 35%,
+    var(--color-background)
+  );
+  border-radius: 0.75rem;
+  background: color-mix(
+    in srgb,
+    var(--color-text) 4%,
+    var(--color-background)
+  );
+  list-style: none;
+}
+
+.services-content li {
+  position: relative;
+  padding-left: 1.75rem;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.services-content li::before {
+  position: absolute;
+  top: 0.55em;
+  left: 0;
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--color-muted);
+  content: "";
+}
+
+@media (min-width: 640px) {
+  .services-content {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.75fr);
+    align-items: start;
+    column-gap: var(--space-3xl);
+  }
+
+  .services-content p {
+    grid-column: 1;
+  }
+
+  .services-content ul {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+
+  .services-actions {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: start;
+  }
+}
 
   .writing-groups {
     display: grid;
