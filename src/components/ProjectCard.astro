@@ -306,7 +306,7 @@ const titleId = `${id}-details-title`;
 
   .tags span {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.5rem;
   border: 1px solid var(--color-muted);
   border-radius: 0.25rem;
   color: var(--color-muted);
@@ -317,7 +317,7 @@ const titleId = `${id}-details-title`;
   .project-dialog {
     position: fixed;
     inset: 0;
-    width: min(54rem, calc(100vw - var(--space-xl)));
+    width: min(40rem, calc(100vw - var(--space-xl)));
     height: min(78svh, 52rem);
     max-height: calc(100svh - var(--space-xl));
     margin: auto;
@@ -356,7 +356,7 @@ const titleId = `${id}-details-title`;
     align-content: start;
     gap: var(--space-xl);
     height: 100%;
-    padding: clamp(var(--space-lg), 5vw, var(--space-2xl));
+    padding: var(--space-2xl) clamp(var(--space-lg), 5vw, var(--space-2xl));
     overflow-y: auto;
     overscroll-behavior: contain;
   }
@@ -390,8 +390,9 @@ const titleId = `${id}-details-title`;
   height: 2rem;
   padding: 0;
 
-  border: 0;
-  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--color-muted) 45%, var(--color-background));
+  border-radius: 0.5rem;
+  background: var(--color-background);
   color: var(--color-accent);
 
   cursor: pointer;

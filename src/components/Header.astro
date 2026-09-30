@@ -127,7 +127,7 @@
   .site-header {
     position: fixed;
     z-index: 10;
-    top: var(--space-xl);
+    top: var(--space-2xl);
     left: 50%;
     width: min(calc(100% - (var(--page-padding) * 2)), var(--container-width));
     height: var(--space-2xl);
@@ -136,6 +136,12 @@
     border-radius: 0.75rem;
     background: rgb(22 37 33 / 94%);
   }
+
+  @media (min-width: 640px) {
+  .site-header {
+    width: min(calc(100% - 9rem), 70rem);
+  }
+}
 
   .header-inner {
     display: flex;

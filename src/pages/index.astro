@@ -326,6 +326,12 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
     
   }
 
+  @media (min-width: 640px) {
+  .hero-supporting {
+    max-width: 26rem;
+  }
+}
+
 
   .hero-actions {
   display: flex;
@@ -404,6 +410,7 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
   .projects-list {
     grid-template-columns: repeat(2, minmax(0, 30rem));
     justify-content: center;
+    gap:var(--space-xl);
   }
 }
 
@@ -458,7 +465,7 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
 @media (min-width: 640px) {
   .services-content {
     grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.75fr);
-    align-items: start;
+    align-items: center;
     column-gap: var(--space-3xl);
   }
 
@@ -481,7 +488,6 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
   .writing-groups {
     display: grid;
     gap: var(--space-2xl);
-    margin-top: var(--space-2xl);
   }
 
   .writing-group {
@@ -516,9 +522,17 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
     margin-top: var(--space-2xl);
   }
 
+  @media (min-width: 640px) {
+    .contact-content {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+      align-items: center;
+      gap: var(--space-2xl);
+    }
+  }
+
   .contact-primary {
     display: grid;
-    justify-items: start;
+    justify-items: center;
     align-content: start;
     gap: var(--space-lg);
   }
@@ -538,8 +552,9 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
   .contact-card {
     display: flex;
     align-items: center;
+    margin-inline: auto;
     gap: var(--space-md);
-    max-width: 100%;
+    max-width: 30rem;
     padding: var(--space-md);
     border: 1px solid color-mix(in srgb, var(--color-muted) 38%, var(--color-background));
     border-radius: 0.75rem;
@@ -555,7 +570,7 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
   .contact-card:hover {
     transform: translateY(-2px);
     border-color: var(--color-muted);
-    box-shadow: 0 0 16px rgb(229 244 227 / 35%);
+    box-shadow: 0 0 16px rgb(229 244 227 / 15%);
   }
 
   .contact-card:focus-visible {
@@ -601,14 +616,6 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
   .contact-card-description {
     color: var(--color-muted);
     font-size: 0.875rem;
-  }
-
-  @media (min-width: 640px) {
-    .contact-content {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
-      align-items: start;
-      gap: var(--space-2xl);
-    }
   }
 
 </style>

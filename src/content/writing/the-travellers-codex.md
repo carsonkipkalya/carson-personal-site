@@ -2,6 +2,9 @@
 title: "The Traveller's Codex"
 description: "Life is a journey..."
 type: "poem"
+publishedOn: "Substack"
+publishedDate: "2026-01-01"
+externalUrl: "https://example.com/replace-with-substack-url"
 ---
 
 The road must not be precise - take any,  
