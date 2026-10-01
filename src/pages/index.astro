@@ -6,6 +6,7 @@ import Button from "../components/Button.astro";
 import ExpandablePost from "../components/ExpandablePost.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import SectionHeading from "../components/SectionHeading.astro";
+import { socials } from "../data/socials";
 
 const projects = await getCollection("projects");
 const writingEntries = await getCollection("writing");
@@ -21,6 +22,7 @@ const writingCreativeWorks = await renderWritingEntries(
   writingEntries.filter((entry) => entry.data.type !== "note"),
 );
 const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.length > 0;
+const [github, x, substack] = socials;
 ---
 
 <BaseLayout>
@@ -35,64 +37,79 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
       <div class="hero-actions">
   <Button href="#projects">View my work</Button>
 
-  <div class="hero-socials" aria-label="External links">
+  <ul class="hero-socials" aria-label="External links">
+    <li>
     <a
-      href="YOUR_GITHUB_URL"
+      href={github.href}
       class="hero-social-link"
-      aria-label="GitHub — software projects"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={github.ariaLabel}
     >
       <svg
         class="hero-social-icon"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 16 16"
         aria-hidden="true"
+        focusable="false"
       >
         <path
           fill="currentColor"
           d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59c.4.07.55-.17.55-.38c0-.19-.01-.82-.01-1.49c-2.01.37-2.53-.49-2.69-.94c-.09-.23-.48-.94-.82-1.13c-.28-.15-.68-.52-.01-.53c.63-.01 1.08.58 1.23.82c.72 1.21 1.87.87 2.33.66c.07-.52.28-.87.51-1.07c-1.78-.2-3.64-.89-3.64-3.95c0-.87.31-1.59.82-2.15c-.08-.2-.36-1.02.08-2.12c0 0 .67-.21 2.2.82c.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82c.44 1.1.16 1.92.08 2.12c.51.56.82 1.27.82 2.15c0 3.07-1.87 3.75-3.65 3.95c.29.25.54.73.54 1.48c0 1.07-.01 1.93-.01 2.2c0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"
         />
       </svg>
-      <span class="hero-social-label">Software projects</span>
+      <span class="hero-social-label">{github.description}</span>
     </a>
+    </li>
 
+    <li>
     <a
-      href="YOUR_X_URL"
+      href={x.href}
       class="hero-social-link"
-      aria-label="X — short-form thoughts"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={x.ariaLabel}
     >
       <svg
         class="hero-social-icon"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 16 16"
         aria-hidden="true"
+        focusable="false"
       >
         <path
           fill="currentColor"
           d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07l-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"
         />
       </svg>
-      <span class="hero-social-label">Short-form thoughts</span>
+      <span class="hero-social-label">{x.description}</span>
     </a>
+    </li>
 
+    <li>
     <a
-      href="YOUR_SUBSTACK_URL"
+      href={substack.href}
       class="hero-social-link"
-      aria-label="Substack — long-form writing"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={substack.ariaLabel}
     >
       <svg
         class="hero-social-icon"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 16 16"
         aria-hidden="true"
+        focusable="false"
       >
         <path
           fill="currentColor"
           d="M15 3.604H1v1.891h14v-1.89ZM1 7.208V16l7-3.926L15 16V7.208zM15 0H1v1.89h14z"
         />
       </svg>
-      <span class="hero-social-label">Long-form writing</span>
+      <span class="hero-social-label">{substack.description}</span>
     </a>
-  </div>
+    </li>
+  </ul>
 </div>
     </div>
   </section>
@@ -144,7 +161,7 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
       <p>
           If you have something you're trying to communicate, I can help turn it into a site that does that.
       </p>
-      <ul>
+      <ul role="list">
         <li>Website and landing-page design</li>
         <li>Responsive front-end development</li>
         <li>Structuring and presenting your content</li>
@@ -152,7 +169,7 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
       </ul>
 
       <div class="services-actions">
-          <Button href="#contact">Work with me</Button>
+          <Button href="mailto:hello.carsonkipkalya@gmail.com">Work with me</Button>
         </div>
     </div>
   </section>
@@ -211,12 +228,13 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
       <div class="contact-primary">
         <p>Interested in working together, talking about a project, or just comparing notes? Send me a message.</p>
         <div class="contact-actions">
-          <Button href="#contact">Get in touch</Button>
+          <Button href="mailto:hello.carsonkipkalya@gmail.com">Get in touch</Button>
         </div>
       </div>
       <ul class="contact-links">
         <li>
-          <a class="contact-card" href="[PLACEHOLDER: destination URL]">
+          <a class="contact-card" href={github.href} target="_blank"
+  rel="noopener noreferrer">
             <svg
               class="hero-social-icon"
               xmlns="http://www.w3.org/2000/svg"
@@ -239,7 +257,8 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
           </a>
         </li>
         <li>
-          <a class="contact-card" href="[PLACEHOLDER: destination URL]">
+          <a class="contact-card" href={x.href} target="_blank"
+      rel="noopener noreferrer">
             <svg
               class="hero-social-icon"
               xmlns="http://www.w3.org/2000/svg"
@@ -262,7 +281,8 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
           </a>
         </li>
         <li>
-          <a class="contact-card" href="[PLACEHOLDER: destination URL]">
+          <a class="contact-card" href={substack.href} target="_blank"
+      rel="noopener noreferrer">
             <svg
               class="hero-social-icon"
               xmlns="http://www.w3.org/2000/svg"
@@ -328,7 +348,13 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
 
   @media (min-width: 640px) {
   .hero-supporting {
-    max-width: 26rem;
+    max-width: clamp(26rem, 50vw, 32rem);
+  }
+}
+
+@media (min-width: 1100px) {
+  .hero-supporting {
+    max-width: 45ch;
   }
 }
 
@@ -340,10 +366,24 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
   margin-top: var(--space-lg);
 }
 
+@media (min-width: 1100px) {
+  .hero-actions {
+    gap: var(--space-2xl);
+    margin-top: var(--space-xl);
+  }
+}
+
 .hero-socials {
   display: flex;
   align-items: center;
   gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-socials li {
+  display: flex;
 }
 
 .hero-social-link {
@@ -399,6 +439,14 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
     max-width: 70ch;
   }
 
+
+  @media (min-width: 640px) {
+    .about-content{
+      max-width: 55ch;
+    }
+  }
+
+
   .projects-list {
     display: grid;
     grid-template-columns: 1fr;
@@ -417,7 +465,6 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
   .services-content {
     display: grid;
     gap: var(--space-xl);
-    max-width: 65ch;
     margin-top: var(--space-2xl);
   }
 
@@ -471,6 +518,7 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
 
   .services-content p {
     grid-column: 1;
+    max-width: 50ch;
   }
 
   .services-content ul {
@@ -616,6 +664,21 @@ const hasBothWritingGroups = writingNotes.length > 0 && writingCreativeWorks.len
   .contact-card-description {
     color: var(--color-muted);
     font-size: 0.875rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-social-icon,
+    .hero-social-label,
+    .contact-card,
+    .contact-card-arrow {
+      transition: none;
+    }
+
+    .hero-social-link:hover .hero-social-icon,
+    .contact-card:hover,
+    .contact-card:hover .contact-card-arrow {
+      transform: none;
+    }
   }
 
 </style>

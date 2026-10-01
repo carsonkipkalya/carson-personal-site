@@ -47,4 +47,15 @@ const { href, type = "button" } = Astro.props;
   .button:active {
     transform: translate(0, 0) scale(0.99);
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button {
+      transition: none;
+    }
+
+    .button:hover,
+    .button:active {
+      transform: none;
+    }
+  }
 </style>

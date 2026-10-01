@@ -35,7 +35,7 @@ const titleId = `${id}-details-title`;
   >
     <span class="project-card-artifact">
       {artifact ? (
-        <img src={artifact.src} alt={artifact.alt} loading="lazy" />
+        <img src={artifact.src} alt={artifact.alt} loading="lazy" decoding="async" />
       ) : (
         <span class="artifact-placeholder">Project artifact</span>
       )}
@@ -109,92 +109,15 @@ const titleId = `${id}-details-title`;
 </article>
 
 <script>
-  const projectCards = document.querySelectorAll<HTMLElement>(".project-card");
-  let activeDialog: HTMLDialogElement | null = null;
-  let previousOverflow = "";
+  import { bindExpandableDialogs } from "../scripts/bind-expandable-dialog";
 
-  for (const card of projectCards) {
-    const openButton = card.querySelector<HTMLButtonElement>("[data-project-open]");
-    const dialog = card.querySelector<HTMLDialogElement>("[data-project-dialog]");
-    const closeButton = card.querySelector<HTMLButtonElement>("[data-project-close]");
-
-    if (!openButton || !dialog || !closeButton) continue;
-
-    let transition: Animation | undefined;
-    let isClosing = false;
-
-    const closeProject = () => {
-      if (!dialog.open || isClosing) return;
-
-      isClosing = true;
-      dialog.classList.add("is-closing");
-
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !transition) {
-        dialog.close();
-        return;
-      }
-
-      transition.onfinish = () => dialog.close();
-      transition.reverse();
-    };
-
-    openButton.addEventListener("click", () => {
-      if (activeDialog || dialog.open) return;
-
-      const cardRect = card.getBoundingClientRect();
-      previousOverflow = document.documentElement.style.overflow;
-      dialog.showModal();
-      const detailContent = dialog.querySelector<HTMLElement>(".project-detail-content");
-      detailContent?.scrollTo({ top: 0, behavior: "instant" });
-      
-      activeDialog = dialog;
-      document.documentElement.style.overflow = "hidden";
-      openButton.setAttribute("aria-expanded", "true");
-      closeButton.focus({ preventScroll: true });
-
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-      const dialogRect = dialog.getBoundingClientRect();
-      const offsetX = cardRect.left + cardRect.width / 2 - (dialogRect.left + dialogRect.width / 2);
-      const offsetY = cardRect.top + cardRect.height / 2 - (dialogRect.top + dialogRect.height / 2);
-      const scaleX = cardRect.width / dialogRect.width;
-      const scaleY = cardRect.height / dialogRect.height;
-
-      transition = dialog.animate(
-        [
-          { transform: `translate(${offsetX}px, ${offsetY}px) scale(${scaleX}, ${scaleY})` },
-          { transform: "translate(0, 0) scale(1, 1)" },
-        ],
-        {
-          duration: 280,
-          easing: "cubic-bezier(0.2, 0.75, 0.25, 1)",
-          fill: "both",
-        },
-      );
-    });
-
-    closeButton.addEventListener("click", closeProject);
-
-    dialog.addEventListener("cancel", (event) => {
-      event.preventDefault();
-      closeProject();
-    });
-
-    dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) closeProject();
-    });
-
-    dialog.addEventListener("close", () => {
-      transition?.cancel();
-      transition = undefined;
-      dialog.classList.remove("is-closing");
-      openButton.setAttribute("aria-expanded", "false");
-      document.documentElement.style.overflow = previousOverflow;
-      activeDialog = null;
-      openButton.focus({ preventScroll: true });
-      isClosing = false;
-    });
-  }
+  bindExpandableDialogs({
+    cardSelector: ".project-card",
+    openSelector: "[data-project-open]",
+    dialogSelector: "[data-project-dialog]",
+    closeSelector: "[data-project-close]",
+    contentSelector: ".project-detail-content",
+  });
 </script>
 
 <style>
@@ -202,7 +125,7 @@ const titleId = `${id}-details-title`;
     border: 1px solid color-mix(in srgb, var(--color-muted) 38%, var(--color-background));
     border-radius: 0.75rem;
     background: color-mix(in srgb, var(--color-text) 4%, var(--color-background));
-    box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 16%);background: color-mix(in srgb, var(--color-text) 4%, var(--color-background));
+    box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 16%);
     transition:
       transform 180ms ease,
       border-color 180ms ease,
@@ -300,6 +223,7 @@ const titleId = `${id}-details-title`;
   }
 
   .project-links {
+    gap: var(--space-lg);
     color: var(--color-muted);
     font-size: 0.875rem;
   }
@@ -318,7 +242,7 @@ const titleId = `${id}-details-title`;
     position: fixed;
     inset: 0;
     width: min(40rem, calc(100vw - var(--space-xl)));
-    height: min(78svh, 52rem);
+    height: min(70svh, 40rem);
     max-height: calc(100svh - var(--space-xl));
     margin: auto;
     padding: 0;
@@ -373,10 +297,6 @@ const titleId = `${id}-details-title`;
     color: var(--color-muted);
   }
 
-  .project-links {
-    gap: var(--space-lg);
-  }
-
   .project-close {
   position: absolute;
   top: var(--space-md);
@@ -413,8 +333,13 @@ const titleId = `${id}-details-title`;
   stroke-linecap: round;
 }
   @media (prefers-reduced-motion: reduce) {
-    .project-card {
+    .project-card,
+    .project-close {
       transition: none;
+    }
+
+    .project-close:hover {
+      transform: none;
     }
 
     .project-dialog::backdrop {

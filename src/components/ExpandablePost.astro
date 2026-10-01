@@ -35,6 +35,20 @@ const titleId = `${id}-writing-title`;
     aria-labelledby={titleId}
     data-writing-dialog
   >
+  <button
+      class="writing-close"
+      type="button"
+      aria-label={`Close writing: ${title}`}
+      data-writing-close
+    >
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
+    </button>
     <div class="writing-dialog-content">
       <header class="writing-dialog-header">
         <h2 id={titleId}>{title}</h2>
@@ -57,112 +71,20 @@ const titleId = `${id}-writing-title`;
         </div>
       )}
     </div>
-    <button
-      class="writing-close"
-      type="button"
-      aria-label={`Close writing: ${title}`}
-      data-writing-close
-    >
-      <svg
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path d="M6 6l12 12M18 6L6 18" />
-      </svg>
-    </button>
+    
   </dialog>
 </article>
 
 <script>
-  const writingCards = document.querySelectorAll<HTMLElement>(".writing-card");
-  let activeDialog: HTMLDialogElement | null = null;
-  let previousOverflow = "";
+  import { bindExpandableDialogs } from "../scripts/bind-expandable-dialog";
 
-  for (const card of writingCards) {
-    const openButton = card.querySelector<HTMLButtonElement>("[data-writing-open]");
-    const dialog = card.querySelector<HTMLDialogElement>("[data-writing-dialog]");
-    const closeButton = card.querySelector<HTMLButtonElement>("[data-writing-close]");
-
-    if (!openButton || !dialog || !closeButton) continue;
-
-    let transition: Animation | undefined;
-    let isClosing = false;
-
-    const closeWriting = () => {
-      if (!dialog.open || isClosing) return;
-
-      isClosing = true;
-      dialog.classList.add("is-closing");
-
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !transition) {
-        dialog.close();
-        return;
-      }
-
-      transition.onfinish = () => dialog.close();
-      transition.reverse();
-    };
-
-    openButton.addEventListener("click", () => {
-      if (activeDialog || dialog.open) return;
-
-      const cardRect = card.getBoundingClientRect();
-      previousOverflow = document.documentElement.style.overflow;
-      dialog.showModal();
-      dialog.querySelector<HTMLElement>(".writing-dialog-content")?.scrollTo({
-        top: 0,
-        behavior: "instant",
-      });
-
-      activeDialog = dialog;
-      document.documentElement.style.overflow = "hidden";
-      openButton.setAttribute("aria-expanded", "true");
-      closeButton.focus({ preventScroll: true });
-
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-      const dialogRect = dialog.getBoundingClientRect();
-      const offsetX = cardRect.left + cardRect.width / 2 - (dialogRect.left + dialogRect.width / 2);
-      const offsetY = cardRect.top + cardRect.height / 2 - (dialogRect.top + dialogRect.height / 2);
-      const scaleX = cardRect.width / dialogRect.width;
-      const scaleY = cardRect.height / dialogRect.height;
-
-      transition = dialog.animate(
-        [
-          { transform: `translate(${offsetX}px, ${offsetY}px) scale(${scaleX}, ${scaleY})` },
-          { transform: "translate(0, 0) scale(1, 1)" },
-        ],
-        {
-          duration: 280,
-          easing: "cubic-bezier(0.2, 0.75, 0.25, 1)",
-          fill: "both",
-        },
-      );
-    });
-
-    closeButton.addEventListener("click", closeWriting);
-
-    dialog.addEventListener("cancel", (event) => {
-      event.preventDefault();
-      closeWriting();
-    });
-
-    dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) closeWriting();
-    });
-
-    dialog.addEventListener("close", () => {
-      transition?.cancel();
-      transition = undefined;
-      dialog.classList.remove("is-closing");
-      openButton.setAttribute("aria-expanded", "false");
-      document.documentElement.style.overflow = previousOverflow;
-      activeDialog = null;
-      openButton.focus({ preventScroll: true });
-      isClosing = false;
-    });
-  }
+  bindExpandableDialogs({
+    cardSelector: ".writing-card",
+    openSelector: "[data-writing-open]",
+    dialogSelector: "[data-writing-dialog]",
+    closeSelector: "[data-writing-close]",
+    contentSelector: ".writing-dialog-content",
+  });
 </script>
 
 <style>
@@ -238,7 +160,7 @@ const titleId = `${id}-writing-title`;
   position: fixed;
   inset: 0;
   width: min(40rem, calc(100vw - var(--space-xl)));
-  height: min(78svh, 52rem);
+  height: min(70svh, 40rem);
   max-height: calc(100svh - var(--space-xl));
   margin: auto;
   padding: 0;
@@ -345,8 +267,13 @@ const titleId = `${id}-writing-title`;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .writing-card {
+    .writing-card,
+    .writing-close {
       transition: none;
+    }
+
+    .writing-close:hover {
+      transform: none;
     }
 
     .writing-dialog::backdrop {

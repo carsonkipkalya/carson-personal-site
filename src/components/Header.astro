@@ -51,12 +51,21 @@
     const header = menuToggle.closest<HTMLElement>(".site-header");
     let closeTimeout: number | undefined;
 
+    const main = document.querySelector("main");
+    const footer = document.querySelector("footer");
+
+    const setBackgroundInert = (inert: boolean) => {
+      if (main) main.inert = inert;
+      if (footer) footer.inert = inert;
+    };
+
     const closeMenu = (restoreFocus = false) => {
       if (closeTimeout !== undefined) window.clearTimeout(closeTimeout);
       menuToggle.setAttribute("aria-expanded", "false");
       menuToggle.setAttribute("aria-label", "Open navigation menu");
       header?.classList.remove("is-open");
       document.body.classList.remove("menu-open");
+      setBackgroundInert(false);
 
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         navigation.hidden = true;
@@ -97,6 +106,7 @@
       menuToggle.setAttribute("aria-label", "Close navigation menu");
       header?.classList.add("is-open");
       document.body.classList.add("menu-open");
+      setBackgroundInert(true);
       navigation.querySelector<HTMLAnchorElement>("a")?.focus();
     });
 
@@ -116,14 +126,6 @@
 </script>
 
 <style>
-  :global(body) {
-    padding-top: calc(var(--site-header-height) + (var(--space-md) * 2));
-  }
-
-  :global(section) {
-    scroll-margin-top: calc(var(--site-header-height) + var(--space-md));
-  }
-
   .site-header {
     position: fixed;
     z-index: 10;
@@ -139,7 +141,7 @@
 
   @media (min-width: 640px) {
   .site-header {
-    width: min(calc(100% - 9rem), 70rem);
+    width: min(calc(100% - 9rem), 50rem);
   }
 }
 

@@ -40,7 +40,7 @@ html {
 
 body {
   margin: 0;
-  padding-top: var(--site-header-height);
+  padding-top: calc(var(--site-header-height) + (var(--space-md) * 2));
   background: var(--color-background);
   color: var(--color-text);
   font-family: var(--font-body);
@@ -98,6 +98,21 @@ p {
 @media (min-width: 640px) {
   .container {
     width: min(calc(100% - 8rem), var(--container-width));
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    width: min(calc(100% - 18rem), var(--container-width));
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    width: min(calc(100% - 30rem), var(--container-width));
+    margin-inline: auto;
   }
 }
 
@@ -111,4 +126,10 @@ section {
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
