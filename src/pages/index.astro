@@ -6,6 +6,7 @@ import Button from "../components/Button.astro";
 import ExpandablePost from "../components/ExpandablePost.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import SectionHeading from "../components/SectionHeading.astro";
+import Myston from "../components/Myston.astro";
 import { socials } from "../data/socials";
 
 const projects = await getCollection("projects");
@@ -113,7 +114,7 @@ const [github, x, substack] = socials;
 </div>
     </div>
   </section>
-
+  <Myston />
   <section id="about" class="container about" aria-label="About and direction">
     <SectionHeading
       label="About"

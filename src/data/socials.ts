@@ -14,7 +14,7 @@ export const socials = [
   {
     name: "Substack",
     description: "Long-form writing",
-    href: "https://substack.com/@carsonkipkalya",
+    href: "https://carsonkipkalya.substack.com",
     ariaLabel: "Substack — long-form writing",
   },
 ] as const;

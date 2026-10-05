@@ -1,5 +1,5 @@
 ---
-title: "Holistic Tracker"
+title: "Cairn"
 description: "A personal system for tracking what I read, watch, and listen to in one place. Right now it's mostly about recording and rating; recommendations are still a design idea."
 tags:
   - "Next.js"
@@ -18,4 +18,4 @@ approach: "Right now the project centers on recording finished items along with 
 outcome: "Even at this early stage, the project has made one thing clearer to me: recording what I watched or read isn't the same as understanding what it means about my taste. Whether the recommendation side actually captures that difference is something I haven't tested yet."
 ---
 
-Holistic Tracker is a personal project for keeping one record of what I consume across different media — books, movies, TV, YouTube, music — instead of maintaining separate tracking systems for each. Particular interest so far has been books and TV shows.
+Cairn is a personal project for keeping one record of what I consume across different media — books, movies, TV, YouTube, music — instead of maintaining separate tracking systems for each. Particular interest so far has been books and TV shows.
